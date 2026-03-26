@@ -1,63 +1,32 @@
 services:
   spark-master:
     image: apache/spark:latest
-    container_name: "spark-master"
-    command: /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master
+    container_name: spark-master
+    user: root
+    environment:
+      - SPARK_MODE=master
     ports:
       - "8080:8080"
       - "7077:7077"
+    command: /opt/spark/bin/spark-class org.apache.spark.deploy.master.Master
     networks:
       - spark-net
 
-  spark-worker-1:
+  spark-worker:
     image: apache/spark:latest
-    container_name: "spark-worker-1"
+    user: root
+    deploy:
+      replicas: 4
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER_URL=spark://spark-master:7077
+      - SPARK_WORKER_CORES=1
+      - SPARK_WORKER_MEMORY=1G
     command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
     depends_on:
       - spark-master
-    environment:
-      - SPARK_WORKER_CORES=1
-      - SPARK_WORKER_MEMORY=1G
     networks:
       - spark-net
-
-  spark-worker-2:
-    image: apache/spark:latest
-    container_name: "spark-worker-2"
-    command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
-    depends_on:
-      - spark-master
-    environment:
-      - SPARK_WORKER_CORES=1
-      - SPARK_WORKER_MEMORY=1G
-    networks:
-      - spark-net
-
-  spark-worker-3:
-    image: apache/spark:latest
-    container_name: "spark-worker-3"
-    command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
-    depends_on:
-      - spark-master
-    environment:
-      - SPARK_WORKER_CORES=1
-      - SPARK_WORKER_MEMORY=1G
-    networks:
-      - spark-net
-
-  spark-worker-4:
-    image: apache/spark:latest
-    container_name: "spark-worker-4"
-    command: /opt/spark/bin/spark-class org.apache.spark.deploy.worker.Worker spark://spark-master:7077
-    depends_on:
-      - spark-master
-    environment:
-      - SPARK_WORKER_CORES=1
-      - SPARK_WORKER_MEMORY=1G
-    networks:
-      - spark-net
-
-
 
 networks:
   spark-net:
