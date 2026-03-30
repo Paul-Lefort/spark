@@ -26,5 +26,13 @@ object SparkTest {
     } finally {
       spark.stop()
     }
+
+    object Twofer {
+      def twofer(name: String): String = ???
+      if(name != "")
+      print ("One for " + name + ",one for me.")
+    }
+
+
   }
 }
